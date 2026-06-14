@@ -6,6 +6,6 @@ export const profile = {
   email: 'morgeat.steve@gmail.com',
   links: {
     github: 'https://github.com/stevemorgeat',
-    linkedin: 'https://www.linkedin.com/in/stevemorgeat', // à confirmer
+    linkedin: 'https://www.linkedin.com/in/steve-morgeat/',
   },
 }

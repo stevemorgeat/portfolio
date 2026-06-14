@@ -18,6 +18,10 @@ export interface Project {
   href?: string
   /** Lien repo public éventuel. */
   repo?: string
+  /** Récit du projet (affiché dans la modale de détail). */
+  story?: string
+  /** Ce que j'y ai appris / fait. */
+  learned?: string[]
 }
 
 export interface SkillGroup {

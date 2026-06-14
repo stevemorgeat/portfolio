@@ -2,6 +2,7 @@ import { Card, CardContent, Typography, Chip, Stack, Button, Box } from '@mui/ma
 import LockIcon from '@mui/icons-material/Lock'
 import LaunchIcon from '@mui/icons-material/Launch'
 import GitHubIcon from '@mui/icons-material/GitHub'
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined'
 import type { Project } from '../types'
 
 const STATUS_CHIP: Record<Project['status'], { label: string; color: 'success' | 'secondary' | 'default'; icon?: React.ReactElement }> = {
@@ -10,7 +11,9 @@ const STATUS_CHIP: Record<Project['status'], { label: string; color: 'success' |
   private: { label: 'Privé', color: 'default', icon: <LockIcon /> },
 }
 
-export const ProjectCard = ({ project }: { project: Project }) => {
+type Props = { project: Project; onOpen?: (project: Project) => void }
+
+export const ProjectCard = ({ project, onOpen }: Props) => {
   const badge = STATUS_CHIP[project.status]
   return (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
@@ -25,15 +28,15 @@ export const ProjectCard = ({ project }: { project: Project }) => {
             <Chip key={t} size="small" label={t} variant="outlined" />
           ))}
         </Stack>
-        <Box sx={{ display: 'flex', gap: 1, mt: 1, alignItems: 'center' }}>
+        <Box sx={{ display: 'flex', gap: 1, mt: 1, flexWrap: 'wrap' }}>
+          {project.story && onOpen && (
+            <Button size="small" startIcon={<InfoOutlinedIcon />} onClick={() => onOpen(project)}>Détails</Button>
+          )}
           {project.href && (
             <Button size="small" variant="contained" endIcon={<LaunchIcon />} href={project.href} target="_blank" rel="noopener">Voir</Button>
           )}
           {project.repo && (
             <Button size="small" variant="outlined" startIcon={<GitHubIcon />} href={project.repo} target="_blank" rel="noopener">Code</Button>
-          )}
-          {project.status === 'private' && !project.href && (
-            <Typography variant="caption" color="text.secondary">Démo sur demande</Typography>
           )}
         </Box>
       </CardContent>

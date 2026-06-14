@@ -1,22 +1,22 @@
 import type { Job } from '../types'
 
-// Périodes à confirmer/affiner par Steve.
+// Périodes à affiner par Steve.
 export const parcours: Job[] = [
   {
     company: 'Skello',
     role: 'Engineering Manager',
     period: 'depuis ~2021',
     summary:
-      "Scale-up SaaS RH. Engineering Manager depuis ~4 ans : je fais grandir mes équipes, je structure, et je continue moi-même de monter en compétences.",
-    tags: ['Scale-up', 'Management', "Scaling d'équipe"],
-    accent: '#bc002d',
+      "La scale-up où je confirme tout ce que j'ai appris avant. Manager d'une équipe orientée tech : scalabilité, montée en charge, et des migrations de fond (Vue → React). Je fais grandir mes gens autant que je continue de grandir moi-même.",
+    tags: ['Scale-up', 'Management tech', 'Scalabilité', 'Migration Vue → React'],
+    accent: '#1f8a5b',
   },
   {
     company: 'Bimbamjob',
     role: 'Développeur → Manager',
     period: 'avant Skello',
     summary:
-      "Boîte à impact social. J'y ai industrialisé ma façon de travailler et je suis passé manager — j'ai tout donné là-bas.",
+      "La mission sociale me faisait lever le matin et donner le petit + le soir : faire les choses bien, pour une bonne cause. J'y ai industrialisé ma façon de travailler et je suis passé manager — j'ai tout donné là-bas.",
     tags: ['Impact social', 'Industrialisation', 'Passage manager'],
     accent: '#2f8f5b',
   },
@@ -25,17 +25,17 @@ export const parcours: Job[] = [
     role: 'Développeur',
     period: 'première expérience',
     summary:
-      "Startup domotique que j'ai kiffée pour sa liberté : le terrain idéal pour monter fort en compétences côté dev.",
-    tags: ['Startup', 'Domotique', 'Montée en compétences'],
+      "Startup domotique que j'ai kiffée pour sa liberté — le terrain idéal pour monter fort en compétences dev. Accessoirement : fan de domotique (Home Assistant, maison full équipée), donc le job rejoignait la passion.",
+    tags: ['Startup', 'Domotique', 'Home Assistant', 'Montée en compétences'],
     accent: '#2f6f8f',
   },
   {
     company: 'Reconversion',
-    role: 'Le déclic',
+    role: 'De magasinier à développeur',
     period: 'il y a ~10 ans',
     summary:
-      "Bientôt 10 ans depuis ma reconversion vers le développement. Le point de départ de tout le reste.",
-    tags: ['Reconversion', 'Dev'],
+      "7 ans magasinier, mais toujours technophile. J'ai fini par faire le site de la boîte — et ce déclic m'a poussé à tenter une reconversion vers le développement. Le point de départ de tout le reste.",
+    tags: ['Reconversion', 'Autodidacte', 'Le déclic'],
     accent: '#c89b3c',
   },
 ]
