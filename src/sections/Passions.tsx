@@ -1,6 +1,7 @@
-import { Container, Box } from '@mui/material'
+import { Container, Box, Typography } from '@mui/material'
 import { SectionTitle } from '../components/SectionTitle'
 import { PassionCard } from '../components/PassionCard'
+import { Gallery } from '../components/Gallery'
 import { passions } from '../data/passions'
 
 export const Passions = () => (
@@ -11,5 +12,8 @@ export const Passions = () => (
         <PassionCard key={p.title} passion={p} />
       ))}
     </Box>
+
+    <Typography variant="h6" sx={{ mt: 5, mb: 2 }}>En vrac — quelques voyages</Typography>
+    <Gallery />
   </Container>
 )
