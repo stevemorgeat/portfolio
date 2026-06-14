@@ -28,13 +28,13 @@ export const Hero = () => (
           <Typography variant="h6" sx={{ color: 'text.secondary', fontWeight: 400, maxWidth: 560 }}>
             {profile.tagline}
           </Typography>
-          <Stack direction="row" spacing={1.5} sx={{ mt: 3.5 }} flexWrap="wrap" useFlexGap>
+          <Stack direction="row" spacing={1.5} sx={{ mt: 3.5 }} flexWrap="wrap" useFlexGap alignItems="center">
             <Button variant="contained" href="#parcours">Voir mon parcours</Button>
             <Button variant="outlined" href="#contact">Me contacter</Button>
             <Button color="inherit" startIcon={<GitHubIcon />} href={profile.links.github} target="_blank" rel="noopener">GitHub</Button>
             <Button color="inherit" startIcon={<LinkedInIcon />} href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</Button>
+            <GithubChips />
           </Stack>
-          <GithubChips />
         </Box>
         <Avatar
           src={asset('steve.png')}
