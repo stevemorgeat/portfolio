@@ -3,6 +3,7 @@ import { Hero } from './sections/Hero'
 import { Parcours } from './sections/Parcours'
 import { Competences } from './sections/Competences'
 import { Realisations } from './sections/Realisations'
+import { Lab } from './sections/Lab'
 import { Passions } from './sections/Passions'
 import { Contact } from './sections/Contact'
 
@@ -13,6 +14,7 @@ export const App = () => (
     <Parcours />
     <Competences />
     <Realisations />
+    <Lab />
     <Passions />
     <Contact />
   </>
