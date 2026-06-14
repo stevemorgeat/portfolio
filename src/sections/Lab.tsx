@@ -1,41 +1,40 @@
-import { Suspense, lazy, useState } from 'react'
-import { Container, Box, Typography, Button } from '@mui/material'
-import ViewInArIcon from '@mui/icons-material/ViewInAr'
+import { Suspense, lazy } from 'react'
+import { Container, Box, Typography, CircularProgress } from '@mui/material'
 import { SectionTitle } from '../components/SectionTitle'
+import { useInView } from '../hooks/useInView'
 
-// Code-split : Three.js ne charge que lorsqu'on lance la démo.
+// Code-split : Three.js charge quand la section approche du viewport.
 const Model3D = lazy(() => import('../components/lab/Model3D').then((m) => ({ default: m.Model3D })))
 
 export const Lab = () => {
-  const [load, setLoad] = useState(false)
+  const { ref, inView } = useInView<HTMLDivElement>()
 
   return (
     <Container maxWidth="lg" sx={{ py: { xs: 6, md: 9 } }}>
       <SectionTitle id="lab" kicker="Lab" title="Démos techniques" />
       <Typography color="text.secondary" sx={{ mb: 3, maxWidth: 640 }}>
-        WebGL / Three.js : un vrai bâtiment 3D que tu peux faire tourner — glisse pour pivoter, molette pour zoomer. Le modèle (~8 Mo) ne se charge qu'à la demande.
+        WebGL / Three.js : un vrai bâtiment 3D, intégré dans la page. Glisse pour le faire pivoter, molette pour zoomer.
       </Typography>
       <Box
+        ref={ref}
         sx={{
-          height: 460,
+          height: 480,
           borderRadius: 3,
           overflow: 'hidden',
           border: '1px solid',
           borderColor: 'divider',
-          bgcolor: '#0e1512',
+          background: 'linear-gradient(180deg,#ffffff 0%,#eef6ee 70%,#e6f0ea 100%)',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
         }}
       >
-        {load ? (
-          <Suspense fallback={<Typography sx={{ color: '#fff' }}>Préparation de la scène…</Typography>}>
+        {inView ? (
+          <Suspense fallback={<CircularProgress color="primary" />}>
             <Model3D />
           </Suspense>
         ) : (
-          <Button variant="contained" size="large" startIcon={<ViewInArIcon />} onClick={() => setLoad(true)}>
-            Lancer la démo 3D (~8 Mo)
-          </Button>
+          <CircularProgress color="primary" />
         )}
       </Box>
     </Container>
