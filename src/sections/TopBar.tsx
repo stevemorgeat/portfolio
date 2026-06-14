@@ -14,8 +14,7 @@ export const TopBar = () => (
   <AppBar
     position="sticky"
     elevation={0}
-    color="default"
-    sx={{ bgcolor: 'rgba(246,249,245,0.85)', backdropFilter: 'blur(10px)', borderBottom: '1px solid', borderColor: 'divider' }}
+    sx={{ bgcolor: 'rgba(20,30,26,0.94)', color: '#fff', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
   >
     <Toolbar>
       <Box component="a" href="#top" sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
