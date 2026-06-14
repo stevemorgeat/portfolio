@@ -6,6 +6,7 @@ const LINKS = [
   { href: '#parcours', label: 'Parcours' },
   { href: '#competences', label: 'Compétences' },
   { href: '#realisations', label: 'Réalisations' },
+  { href: '#passions', label: 'Hors-code' },
   { href: '#contact', label: 'Contact' },
 ]
 
