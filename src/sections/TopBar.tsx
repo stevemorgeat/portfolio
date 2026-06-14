@@ -18,7 +18,7 @@ export const TopBar = () => (
   >
     <Toolbar>
       <Box component="a" href="#top" sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
-        <Box component="img" src={asset('logo.png')} alt={profile.name} sx={{ height: 42, display: 'block' }} />
+        <Box component="img" src={asset('logo.png')} alt={profile.name} sx={{ height: 56, display: 'block' }} />
       </Box>
       <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', sm: 'flex' } }}>
         {LINKS.map((l) => (
