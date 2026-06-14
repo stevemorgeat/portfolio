@@ -1,5 +1,5 @@
-import { AppBar, Toolbar, Typography, Button, Box, Stack } from '@mui/material'
-import { Logo } from '../components/Logo'
+import { AppBar, Toolbar, Button, Box, Stack } from '@mui/material'
+import { asset } from '../asset'
 import { profile } from '../data/profile'
 
 const LINKS = [
@@ -18,9 +18,8 @@ export const TopBar = () => (
     sx={{ bgcolor: 'rgba(246,249,245,0.85)', backdropFilter: 'blur(10px)', borderBottom: '1px solid', borderColor: 'divider' }}
   >
     <Toolbar>
-      <Box component="a" href="#top" sx={{ display: 'flex', alignItems: 'center', gap: 1, flexGrow: 1, textDecoration: 'none', color: 'text.primary' }}>
-        <Logo size={26} />
-        <Typography variant="h6">{profile.name}</Typography>
+      <Box component="a" href="#top" sx={{ display: 'flex', alignItems: 'center', flexGrow: 1 }}>
+        <Box component="img" src={asset('logo.png')} alt={profile.name} sx={{ height: 34 }} />
       </Box>
       <Stack direction="row" spacing={1} sx={{ display: { xs: 'none', sm: 'flex' } }}>
         {LINKS.map((l) => (

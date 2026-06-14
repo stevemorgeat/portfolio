@@ -20,8 +20,9 @@ export const projects: Project[] = [
     status: 'live',
     repo: 'https://github.com/stevemorgeat/portfolio',
     story:
-      "Sorti à l'origine au moment de ma reconversion, il a évolué avec le temps — à chaque nouvelle compétence, une nouvelle version. Aujourd'hui c'est aussi une démo de bonnes pratiques : React 19, tests, CI/CD, archi propre.",
+      "Sorti à l'origine au moment de ma reconversion, il a évolué avec le temps — à chaque nouvelle compétence, une nouvelle version. Voici d'ailleurs à quoi ressemblait l'ancienne version. Aujourd'hui c'est aussi une démo de bonnes pratiques : React 19, tests, CI/CD, archi propre.",
     learned: ['Faire évoluer une base dans la durée', 'Bonnes pratiques front (tests, lint, CI)', 'Vitrine = preuve par le code'],
+    images: ['portfolio-1.jpg', 'portfolio-2.jpg', 'portfolio-3.jpg'],
   },
   {
     title: 'svc-contact',
@@ -58,5 +59,6 @@ export const projects: Project[] = [
     story:
       "Là où tout a commencé. Magasinier chez Richter & Cie pendant 7 ans mais toujours technophile, j'ai fini par construire le site de la boîte — du HTML/CSS appris sur le Site du Zéro (futur OpenClassrooms). Ce déclic m'a poussé à tenter la reconversion. Le petit samouraï du logo lui rend hommage.",
     learned: ['Les fondamentaux HTML/CSS', "L'étincelle de la reconversion", "Oser changer de voie à 100 %"],
+    images: ['richter-1.jpg', 'richter-2.jpg', 'richter-3.jpg'],
   },
 ]

@@ -3,6 +3,7 @@ import CloseIcon from '@mui/icons-material/Close'
 import LaunchIcon from '@mui/icons-material/Launch'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import CheckCircleIcon from '@mui/icons-material/CheckCircle'
+import { asset } from '../asset'
 import type { Project } from '../types'
 
 export const ProjectDialog = ({ project, onClose }: { project: Project | null; onClose: () => void }) => (
@@ -16,6 +17,13 @@ export const ProjectDialog = ({ project, onClose }: { project: Project | null; o
           </IconButton>
         </DialogTitle>
         <DialogContent>
+          {project.images?.length ? (
+            <Box sx={{ display: 'flex', gap: 1, overflowX: 'auto', mb: 2, pb: 1 }}>
+              {project.images.map((img, i) => (
+                <Box key={i} component="img" src={asset(img)} alt={`${project.title} ${i + 1}`} loading="lazy" sx={{ height: 190, borderRadius: 1.5, flex: '0 0 auto', border: '1px solid', borderColor: 'divider' }} />
+              ))}
+            </Box>
+          ) : null}
           <Stack direction="row" gap={0.5} flexWrap="wrap" sx={{ mb: 2 }}>
             {project.tags.map((t) => (
               <Chip key={t} size="small" label={t} variant="outlined" />

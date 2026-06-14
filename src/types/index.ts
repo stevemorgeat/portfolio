@@ -22,6 +22,8 @@ export interface Project {
   story?: string
   /** Ce que j'y ai appris / fait. */
   learned?: string[]
+  /** Captures (chemins d'assets public/) affichées en galerie dans la modale. */
+  images?: string[]
 }
 
 export interface SkillGroup {
