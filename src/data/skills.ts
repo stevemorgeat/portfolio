@@ -3,22 +3,22 @@ import type { SkillGroup } from '../types'
 export const skills: SkillGroup[] = [
   {
     label: 'Frontend',
-    items: ['TypeScript', 'React 19 / React Native', 'MUI', 'react-hook-form', 'TanStack (Query/Table/Virtual)'],
+    items: ['TypeScript', 'React 19 / hooks', 'React Native', 'Vue.js', 'MUI', 'Atomic design', 'Single-spa (microfront)'],
   },
   {
     label: 'Backend / Serverless',
-    items: ['Node.js', 'AWS Lambda', 'SES', 'API REST', 'Serverless Framework'],
+    items: ['Node.js', 'TypeScript', 'Ruby on Rails', 'AWS Lambda / Serverless', 'SQS / SNS', 'Architecture event-driven'],
   },
   {
-    label: 'Cloud & DevOps',
-    items: ['AWS (S3, CloudFront, IAM/OIDC)', 'GitHub Actions CI/CD', 'Vite', 'Déploiement auto'],
+    label: 'Cloud & Data',
+    items: ['AWS (S3, CloudFront, IAM/OIDC)', 'DynamoDB', 'Aurora PostgreSQL', 'Kinesis / DMS', 'MongoDB / Atlas'],
   },
   {
-    label: 'Qualité',
-    items: ['Tests (Vitest / Testing Library)', 'ESLint + Prettier', 'Composants purs + hooks', 'React Compiler'],
+    label: 'Qualité & DevOps',
+    items: ['Tests (Vitest / front)', 'CI/CD (GitHub Actions)', 'Datadog', 'Sentry', 'Optimisation coûts AWS'],
   },
   {
     label: 'Management',
-    items: ['Engineering Management', 'Faire grandir les équipes', 'Industrialisation', 'Recrutement', "Scaling & migration de stack"],
+    items: ['Engineering Management', 'Faire grandir les équipes', '1:1 & entretiens annuels', 'Agile (PO / PM)', 'Recrutement', 'Scaling & migration de stack'],
   },
 ]

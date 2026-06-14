@@ -51,12 +51,12 @@ export const projects: Project[] = [
     learned: ['Concevoir évolutif', 'Configurateur produit (à venir)', 'Du vitrine au transactionnel'],
   },
   {
-    title: 'Richter',
-    description: "Mon tout premier site (HTML/CSS), né du Site du Zéro (devenu OpenClassrooms).",
+    title: 'Richter & Cie',
+    description: "Le site de mon employeur quand j'étais magasinier — mon tout premier site (HTML/CSS).",
     tags: ['HTML', 'CSS', 'Les débuts'],
     status: 'private',
     story:
-      "Là où tout a commencé : du HTML/CSS avec le Site du Zéro (futur OpenClassrooms). C'est ce projet qui m'a donné le déclic pour me lancer dans la reconversion. Le petit samouraï du logo lui rend hommage.",
-    learned: ['Les fondamentaux HTML/CSS', "L'étincelle de la reconversion", "L'envie de continuer"],
+      "Là où tout a commencé. Magasinier chez Richter & Cie pendant 7 ans mais toujours technophile, j'ai fini par construire le site de la boîte — du HTML/CSS appris sur le Site du Zéro (futur OpenClassrooms). Ce déclic m'a poussé à tenter la reconversion. Le petit samouraï du logo lui rend hommage.",
+    learned: ['Les fondamentaux HTML/CSS', "L'étincelle de la reconversion", "Oser changer de voie à 100 %"],
   },
 ]

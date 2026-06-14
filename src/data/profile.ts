@@ -1,8 +1,8 @@
 export const profile = {
   name: 'Steve Morgeat',
-  title: 'Engineering Manager & builder',
+  title: 'Engineering Manager & développeur fullstack',
   tagline:
-    'De développeur à Engineering Manager. Je fais grandir des équipes — et je continue de livrer.',
+    'De magasinier à Engineering Manager. Je fais grandir des équipes — et je continue de livrer (front, back, serverless).',
   email: 'morgeat.steve@gmail.com',
   links: {
     github: 'https://github.com/stevemorgeat',
