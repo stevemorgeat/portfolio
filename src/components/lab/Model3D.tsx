@@ -1,4 +1,5 @@
 import { Suspense } from 'react'
+import { TOUCH } from 'three'
 import { Canvas } from '@react-three/fiber'
 import { OrbitControls, Bounds, Center, Html, useGLTF } from '@react-three/drei'
 import { asset } from '../../asset'
@@ -19,6 +20,12 @@ export const Model3D = () => (
         </Center>
       </Bounds>
     </Suspense>
-    <OrbitControls autoRotate autoRotateSpeed={0.8} enablePan={false} makeDefault />
+    <OrbitControls
+      autoRotate
+      autoRotateSpeed={0.8}
+      enablePan={false}
+      makeDefault
+      touches={{ ONE: undefined, TWO: TOUCH.DOLLY_ROTATE }}
+    />
   </Canvas>
 )

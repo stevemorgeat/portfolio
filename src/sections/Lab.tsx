@@ -17,7 +17,7 @@ export const Lab = () => {
       </Typography>
       <Box
         ref={ref}
-        sx={{ height: 480, display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+        sx={{ height: 440, width: '100%', maxWidth: 620, mx: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}
       >
         {inView ? (
           <Suspense fallback={<CircularProgress color="primary" />}>
