@@ -21,7 +21,7 @@ describe('App (intégration)', () => {
     // Hors-code
     expect(screen.getByText('Jeux vidéo & rétro gaming')).toBeInTheDocument()
 
-    // Contact
-    expect(screen.getByRole('link', { name: /morgeat\.steve@gmail\.com/i })).toBeInTheDocument()
+    // Contact (formulaire)
+    expect(screen.getByRole('button', { name: /envoyer/i })).toBeInTheDocument()
   })
 })
