@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Button, Stack } from '@mui/material'
+import { Box, Container, Typography, Button, Stack, Avatar } from '@mui/material'
 import GitHubIcon from '@mui/icons-material/GitHub'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import { Logo } from '../components/Logo'
@@ -34,11 +34,10 @@ export const Hero = () => (
             <Button color="inherit" startIcon={<LinkedInIcon />} href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</Button>
           </Stack>
         </Box>
-        <Box
-          component="img"
+        <Avatar
           src={asset('steve.png')}
           alt={profile.name}
-          sx={{ width: { xs: 160, md: 200 }, height: { xs: 160, md: 200 }, borderRadius: '24px', objectFit: 'cover', boxShadow: 4, flexShrink: 0, border: '3px solid #fff' }}
+          sx={{ width: { xs: 190, md: 260 }, height: { xs: 190, md: 260 }, boxShadow: 5, flexShrink: 0, border: '4px solid #fff' }}
         />
       </Stack>
     </Container>
