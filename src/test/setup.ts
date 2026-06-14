@@ -12,6 +12,9 @@ class IntersectionObserverMock {
 }
 vi.stubGlobal('IntersectionObserver', IntersectionObserverMock)
 
+// Pas d'appel réseau réel en test (GitHub API, etc.).
+vi.stubGlobal('fetch', vi.fn(() => Promise.reject(new Error('réseau désactivé en test'))))
+
 vi.stubGlobal('matchMedia', (query: string) => ({
   matches: false,
   media: query,
