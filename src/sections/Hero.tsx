@@ -2,6 +2,7 @@ import { Box, Container, Typography, Button, Stack, Avatar } from '@mui/material
 import GitHubIcon from '@mui/icons-material/GitHub'
 import LinkedInIcon from '@mui/icons-material/LinkedIn'
 import { Logo } from '../components/Logo'
+import { GithubChips } from '../components/GithubChips'
 import { asset } from '../asset'
 import { profile } from '../data/profile'
 
@@ -33,6 +34,7 @@ export const Hero = () => (
             <Button color="inherit" startIcon={<GitHubIcon />} href={profile.links.github} target="_blank" rel="noopener">GitHub</Button>
             <Button color="inherit" startIcon={<LinkedInIcon />} href={profile.links.linkedin} target="_blank" rel="noopener">LinkedIn</Button>
           </Stack>
+          <GithubChips />
         </Box>
         <Avatar
           src={asset('steve.png')}

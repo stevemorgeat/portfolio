@@ -1,7 +1,6 @@
 import { Suspense, lazy } from 'react'
 import { Container, Box, Typography, CircularProgress } from '@mui/material'
 import { SectionTitle } from '../components/SectionTitle'
-import { GithubStats } from '../components/GithubStats'
 import { useInView } from '../hooks/useInView'
 
 // Code-split : Three.js charge quand la section approche du viewport.
@@ -27,11 +26,6 @@ export const Lab = () => {
         ) : (
           <CircularProgress color="primary" />
         )}
-      </Box>
-
-      <Typography variant="h6" sx={{ mt: 5, mb: 2 }}>Données live — mon activité GitHub</Typography>
-      <Box sx={{ maxWidth: 620 }}>
-        <GithubStats />
       </Box>
     </Container>
   )
