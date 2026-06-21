@@ -4,12 +4,14 @@ on:
   push:
     branches: [main]
     paths:
-      - "src/**"
+      - "app/**"
+      - "lib/**"
+      - "content/**"
       - "public/**"
-      - "index.html"
+      - "scripts/**"
+      - "next.config.mjs"
       - "package.json"
       - "package-lock.json"
-      - "vite.config.ts"
       - ".github/workflows/deploy.yml"
   workflow_dispatch: {}
 
@@ -21,8 +23,8 @@ concurrency:
   group: deploy-${{ github.ref }}
   cancel-in-progress: true
 
-# Site principal -> racine du bucket. On EXCLUT projets/* pour ne pas écraser
-# les projets déployés (ex. /projets/voyages/japon).
+# Site principal (le blog Next, export statique) -> racine du bucket.
+# On EXCLUT projets/* pour ne pas écraser les sous-sites déployés (ex. couvreur Hassli).
 env:
   AWS_REGION: eu-west-3
   S3_BUCKET: stevemorgeat.fr
@@ -39,7 +41,7 @@ jobs:
           node-version: "20"
           cache: "npm"
       - run: npm ci
-      - run: npm run build
+      - run: npm run build:next # next build (export statique) + sitemap/RSS/robots -> out/
 
       - name: Configure AWS (OIDC)
         uses: aws-actions/configure-aws-credentials@v4
@@ -47,8 +49,20 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
           aws-region: ${{ env.AWS_REGION }}
 
-      - name: Sync dist vers la racine (projets/* protégés)
-        run: aws s3 sync dist "s3://$S3_BUCKET" --delete --exclude "projets/*"
+      # 2 passes de cache : les assets Next (noms hashés) sont immutables et mis en
+      # cache 1 an ; le HTML et les fichiers SEO restent revalidés pour que la
+      # mise en ligne soit prise en compte tout de suite. projets/* protégés.
+      - name: Sync assets (immutable, cache long)
+        run: |
+          aws s3 sync out "s3://$S3_BUCKET" --delete \
+            --exclude "projets/*" --exclude "*.html" --exclude "*.xml" --exclude "*.txt" \
+            --cache-control "public,max-age=31536000,immutable"
+
+      - name: Sync HTML & SEO (no-cache)
+        run: |
+          aws s3 sync out "s3://$S3_BUCKET" \
+            --exclude "*" --include "*.html" --include "*.xml" --include "*.txt" \
+            --cache-control "no-cache"
 
       - name: Invalidation CloudFront
         run: aws cloudfront create-invalidation --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" --paths "/*"

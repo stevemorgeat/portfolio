@@ -1,0 +1,68 @@
+---
+title: "J'ai donné un cerveau à ma maison avec 3 marques qui ne se parlent pas"
+slug: "domotique-homeassistant-netatmo-legrand"
+description: "Retour d'expérience sur ma domotique perso : HomeAssistant en cerveau, Netatmo et Legrand branchés dessus."
+date: "2026-05-10"
+category: "note"
+format: "article"
+tags: ["domotique", "homeassistant", "netatmo", "legrand", "maison"]
+draft: true
+---
+
+J'ai un principe simple en domotique : je veux que ma maison m'obéisse, pas que j'obéisse à trois apps différentes. Au départ j'avais l'app Netatmo d'un côté, l'app Legrand de l'autre, et entre les deux... rien. Chaque marque dans son coin, chaque routine impossible à croiser. C'est exactement le genre de friction qui me sort de mes gonds — alors j'ai mis HomeAssistant au centre.
+
+Voici comment c'est foutu, ce qui marche, et ce que je referais autrement.
+
+## Pourquoi HomeAssistant comme cerveau
+
+Le piège classique de la domotique, c'est de se laisser enfermer dans l'écosystème d'un fabricant. Tu achètes du Netatmo, tu vis dans l'app Netatmo. Tu ajoutes du Legrand, tu jongles avec une deuxième app. Et le jour où tu veux une règle du type « si la température baisse ET qu'il est plus de 22h, alors... », tu te rends compte qu'aucune des deux apps ne sait parler à l'autre.
+
+HomeAssistant résout ça parce qu'il est :
+
+- **Ouvert** : open source, communauté énorme, tu n'es l'otage de personne.
+- **Agnostique** : il intègre des centaines de marques. Netatmo et Legrand deviennent juste des *sources de données et d'actions* parmi d'autres, sous un même toit.
+- **Local d'abord** : une grande partie tourne chez moi, pas dans un cloud que quelqu'un peut décider d'éteindre. Pour un dev, c'est aussi rassurant que satisfaisant.
+
+En gros, je suis passé de « plusieurs apps qui ne se parlent pas » à « un seul endroit où je vois tout et je décide de tout ». Pour quelqu'un qui code des systèmes toute la journée, retrouver cette logique de *single source of truth* à la maison, ça fait du bien.
+
+Je le fais tourner sur [À compléter par Steve — Raspberry Pi ? mini-PC ? NUC ? HA Green/Yellow ?].
+
+## Comment Netatmo s'intègre
+
+Netatmo passe par une intégration officielle dans HomeAssistant. Concrètement, mes appareils Netatmo remontent dans HA comme des entités que je peux lire et piloter.
+
+Côté Netatmo j'ai [À compléter par Steve — station météo ? thermostat ? vannes ? caméras ? détecteurs ?]. Une fois l'intégration en place, leurs mesures (température, [À compléter par Steve]) et leurs contrôles deviennent disponibles dans HA.
+
+Un point d'honnêteté : l'intégration Netatmo passe historiquement par leur **cloud / OAuth**, donc ce bout-là n'est pas 100 % local. C'est le compromis que j'ai accepté pour ces appareils précis. [À compléter par Steve si setup local spécifique].
+
+## Comment Legrand s'intègre
+
+Côté Legrand, j'ai [À compléter par Steve — gamme exacte : Céliane with Netatmo ? MyHome ? Drivia ? interrupteurs connectés ? volets ?]. Là encore, ça remonte dans HomeAssistant via [À compléter par Steve — intégration officielle Legrand/Home + Control ? autre ?], ce qui me permet de piloter [À compléter par Steve — éclairages ? prises ? volets ?] depuis la même interface que le reste.
+
+Détail amusant : une partie de la gamme connectée Legrand est en fait construite *avec* Netatmo. Les deux mondes sont donc moins étanches qu'ils en ont l'air — mais ça ne dispense pas d'un chef d'orchestre au-dessus, et c'est là que HA reprend la main.
+
+## Ce qui marche bien
+
+- **Tout au même endroit.** Un seul dashboard, une seule app sur le téléphone, plus de jonglage. C'est le bénéfice numéro un, et de loin.
+- **Les automatisations croisées.** Le vrai déclic, c'est quand une règle mélange les marques : un capteur Netatmo qui déclenche une action Legrand. Impossible sans HA. [À compléter par Steve — exemple concret d'automatisation préférée].
+- **La maîtrise.** Je vois l'historique, je trace les états, je débogue comme un système que je connais. Mentalité de dev appliquée au salon.
+- **L'extensibilité.** Ajouter une nouvelle marque plus tard ne casse rien : ça s'ajoute, ça ne se remplace pas.
+
+## Ce que je referais autrement
+
+- **Réfléchir au local vs cloud AVANT d'acheter.** Certaines intégrations dépendent du cloud du fabricant. Si je recommençais, je vérifierais ce point pour chaque appareil avant de sortir la carte bleue, pas après. [À compléter par Steve — frustration cloud précise ?]
+- **Standardiser le protocole.** Mélanger des écosystèmes propriétaires, ça marche, mais à refaire je regarderais de plus près [À compléter par Steve — Zigbee / Matter / Thread ?] pour réduire la dépendance aux ponts de chaque marque.
+- **Documenter mes automatisations.** Comme pour du code : six mois plus tard, on ne se souvient plus pourquoi une règle existe. [À compléter par Steve si tu tiens une doc / un repo de config].
+- **Ne pas tout vouloir automatiser le premier week-end.** J'ai voulu en faire trop, trop vite. [À compléter par Steve].
+
+## Conseils si tu te lances
+
+1. **Commence par le cerveau, pas par les gadgets.** Installe HomeAssistant d'abord, ajoute un seul appareil, comprends la logique entités/automatisations. Ensuite tu étends.
+2. **Vérifie l'intégration avant d'acheter.** Un produit « connecté » n'est pas forcément bien intégré à HA. La doc et le forum de la communauté sont tes amis.
+3. **Privilégie le local quand tu peux.** Moins de dépendance au cloud = moins de surprises le jour où un service ferme ou tombe.
+4. **Va doucement sur les automatisations.** Une règle qui marche vaut mieux que dix règles à moitié cassées. Itère.
+5. **Accepte que c'est un projet vivant.** Ça ne sera jamais « fini ». C'est aussi ça qui est sympa.
+
+## En résumé
+
+HomeAssistant au centre, Netatmo et Legrand branchés dessus : je suis passé d'une collection d'apps isolées à une vraie maison cohérente que je pilote comme un système. Ce n'est pas parfait — le cloud de certains fabricants reste un compromis — mais le confort d'avoir un seul cerveau ouvert et agnostique vaut largement le temps investi. Et honnêtement, appliquer mes réflexes de dev à ma propre maison, c'est un plaisir coupable que j'assume.

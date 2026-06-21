@@ -1,0 +1,115 @@
+---
+title: "J'ai sur-dimensionné un simple formulaire de contact — 3 bugs invisibles m'ont puni"
+slug: "contact-nestjs-serverless-3-bugs"
+description: "Comment j'ai sur-dimensionné un formulaire de contact en NestJS Lambda — et les 3 bugs runtime invisibles au build qui m'ont coûté une soirée."
+date: "2026-06-13"
+category: "techno"
+format: "article"
+tags: ["nestjs", "aws", "serverless", "fastify", "typescript"]
+draft: false
+featured: true
+---
+
+J'avais besoin d'un truc simple : un formulaire de contact pour mon site. Un champ message, un email, et ça part dans ma boîte mail. De quoi tenir en une fonction Lambda et un appel à un provider d'email.
+
+Sauf que je l'ai fait en NestJS serverless, en architecture hexagonale, avec des ports & adapters, des providers d'email interchangeables et des templates MJML. Oui, c'est complètement sur-dimensionné pour envoyer un mail. Et c'était volontaire : c'est une vitrine, et surtout c'est un terrain de jeu pour apprendre le combo NestJS + Lambda + Fastify pour de vrai.
+
+Spoiler : j'ai appris. Surtout grâce à trois bugs runtime qui ne m'ont rien dit au build, et qui m'ont fait douter de ma santé mentale pendant une bonne soirée.
+
+## L'archi (et pourquoi je me suis compliqué la vie)
+
+L'idée directrice : ne jamais coder « envoie un email ». Coder « envoie une notification », et brancher l'email comme un adaptateur parmi d'autres.
+
+- Un **port** `NotificationSender` côté domaine, qui ne connaît rien à SES ni à Brevo.
+- Des **adapters** interchangeables : SES aujourd'hui, Brevo demain, sans toucher au domaine.
+- Des **templates MJML** compilés pour avoir un rendu propre sans bricoler du HTML inline.
+- Et derrière, l'objectif assumé : email maintenant, SMS et push plus tard sans réécrire le cœur.
+
+Pour un formulaire de contact ? Largement trop. Pour comprendre comment on structure un service Nest qui ne soit pas un sac de nœuds dès qu'on ajoute un canal ? Parfait.
+
+## Les pièges de build (l'apéritif)
+
+Avant même le runtime, NestJS sur Lambda demande de dompter le bundler. NestJS repose massivement sur les **décorateurs** et la **réflexion de métadonnées** pour son injection de dépendances. Or esbuild, par défaut, **n'émet pas cette métadata**. Résultat : la DI casse, Nest n'arrive plus à résoudre quoi injecter où.
+
+La parade :
+
+- Bundler avec **`esbuild-plugin-tsc`** pour que la métadata des décorateurs soit bien émise (esbuild seul ne sait pas le faire).
+- Même problème côté tests : **vitest** ne gère pas la métadata nativement, il faut passer par **SWC**.
+- Marquer en **`external`** les dépendances optionnelles de Nest (`@nestjs/platform-express` et compagnie) que je n'utilise pas — sinon le bundle plante en essayant de résoudre des modules absents.
+
+Une fois ça réglé, `serverless package` passe au vert. Et c'est précisément là que le vrai piège commence.
+
+## Les 3 bugs runtime (le plat de résistance)
+
+Tous les trois ont un point commun : **invisibles au build, invisibles au package**. Le zip se construit, le déploiement réussit, et puis API Gateway me renvoie des 500 sans rien m'expliquer.
+
+### 1. `minify: true` cassait Fastify en silence
+
+Symptôme le plus retors de la série : **500 sur toutes les requêtes**… alors que le mail partait quand même. Comprendre : le handler faisait son boulot, le provider d'email recevait sa requête, et pourtant la réponse HTTP explosait.
+
+La cause : le `minify` d'esbuild renommait/mutilait des bouts de l'état interne de Fastify. Fastify s'appuie sur des noms et des structures internes que la minification ne devrait pas toucher, mais qu'elle touchait quand même.
+
+```js
+// esbuild config
+{
+  minify: false, // Fastify n'aime pas se faire renommer ses entrailles
+}
+```
+
+Économiser quelques Ko de bundle ne valait pas une soirée de debug. `minify: false`, point.
+
+### 2. Décorer Fastify AVANT de démarrer Nest
+
+`@fastify/aws-lambda` (`awsLambdaFastify`) décore l'instance Fastify pour la rendre compatible avec l'event/contexte Lambda. Le piège : il faut le faire **avant** que Nest ne démarre l'application.
+
+Si on décore après le `NestFactory.create()` (donc après le démarrage), Fastify râle :
+
+```
+The decorator 'awsLambda' has been added after start!
+```
+
+L'ordre des opérations est tout l'enjeu : on récupère l'adapter Fastify, on le décore, **puis** seulement on laisse Nest s'initialiser dessus. Une inversion de deux lignes, et tout tombe.
+
+### 3. Le mode promise, pas le callback
+
+Dernier de la série, le plus sournois côté API Gateway. Le wrapper Lambda de Fastify peut fonctionner en mode callback **ou** en mode promise. J'étais parti sur le callback.
+
+Problème : ma Lambda **résolvait `undefined`** avant que la réponse soit prête. API Gateway recevait une réponse vide → 500. Le mail partait (encore lui), mais le client ne recevait jamais une réponse valide.
+
+La solution : **retourner la promesse** du proxy plutôt que de lui passer le callback. La Lambda attend la vraie résolution, API Gateway reçoit une vraie réponse.
+
+```ts
+// NON : résout undefined avant la fin
+export const handler = (event, context, callback) =>
+  proxy(event, context, callback);
+
+// OUI : on attend la vraie réponse
+export const handler = (event, context) => proxy(event, context);
+```
+
+## La vraie leçon : `package` ≠ « ça marche »
+
+Le fil rouge de ces trois bugs : **`serverless package` qui réussit ne prouve rien sur le runtime.** Le build vert m'a donné une fausse confiance à chaque fois.
+
+Ce qui m'a débloqué, c'est d'arrêter de déployer pour tester. À la place : **dézipper le bundle et l'invoquer en local**, avec un event Lambda simulé, pour reproduire le comportement runtime réel avant de pousser quoi que ce soit. Les trois bugs se reproduisaient en local — il suffisait de regarder au bon endroit, pas dans les logs CloudWatch après un déploiement de plus.
+
+## Sécuriser un endpoint public sans auth
+
+Un formulaire de contact, c'est public par définition : pas de login, pas de token. Donc défense en profondeur, plusieurs couches qui se complètent :
+
+- **Throttling au niveau API Gateway** pour limiter le flood.
+- **Guards applicatifs** : vérification de l'origine côté serveur et **Cloudflare Turnstile** pour filtrer les bots sans casser les pieds à l'utilisateur.
+- **`ValidationPipe`** de Nest pour rejeter tout payload mal formé avant même qu'il atteigne le domaine.
+- Un bon vieux **honeypot** : un champ invisible que seuls les bots remplissent.
+
+Aucune de ces couches n'est suffisante seule. Empilées, elles rendent l'endpoint pénible à abuser.
+
+## Déploiement : zéro clé AWS stockée
+
+Côté CI/CD, **GitHub Actions en OIDC**. Pas de clé d'accès AWS planquée dans les secrets du repo : GitHub s'authentifie auprès d'AWS via un rôle et un fournisseur d'identité OIDC, le temps du job. Une variable de moins à faire fuiter, un secret de moins à faire tourner.
+
+## Alors, sur-dimensionné ?
+
+Honnêtement, oui. Pour envoyer un email de formulaire de contact, NestJS hexagonal avec providers interchangeables et templates MJML, c'est sortir le bazooka pour un moustique.
+
+Mais est-ce que ça en valait la peine ? Oui, sans hésiter. J'ai une base réutilisable propre pour mes prochains canaux de notification, et surtout j'ai compris en profondeur le triptyque NestJS + Lambda + Fastify — y compris ses pièges qui ne se révèlent qu'au runtime. Les trois bugs valaient le détour : ce sont exactement le genre de trucs qu'on ne lit nulle part tant qu'on ne se les prend pas en pleine figure.

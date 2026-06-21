@@ -1,0 +1,75 @@
+---
+title: "J'en avais marre des apps de voyage, alors j'ai codé la mienne"
+slug: "trip-builder-planificateur-voyage-japon"
+description: "J'ai codé mon propre planificateur de voyage pour 14 jours au Japon en famille. Pourquoi le fait maison, et ce que ça m'a appris."
+date: "2026-06-05"
+category: "projet"
+format: "article"
+tags: ["react", "vite", "mui", "projet-perso", "voyage"]
+draft: false
+---
+
+Quand on prépare deux semaines au Japon en famille, on accumule vite une montagne d'infos : les nuits par ville, les trains, les réservations à faire des mois à l'avance, la météo qui change tout, et bien sûr les prix de vols qu'on surveille comme le lait sur le feu. J'ai d'abord essayé de tenir ça dans un tableur partagé. Au bout d'une semaine, le tableur avait gagné. J'ai donc fait ce que fait tout dev un peu têtu : j'ai codé mon propre outil. Ça s'appelle **trip-builder**.
+
+## Ce que ça fait
+
+L'app est volontairement simple. Un stack que je connais par cœur pour ne pas perdre de temps sur l'outillage :
+
+- **React + Vite** pour le dev rapide et le build léger.
+- **MUI** pour ne pas réinventer chaque bouton et avoir un truc présentable tout de suite.
+
+Côté fonctionnalités, trois choses qui me servaient vraiment au quotidien :
+
+- **Itinéraire jour par jour** : chaque journée a sa ville, ses activités, ses notes (le ryokan réservé, le créneau du musée, le train de 9h12).
+- **Météo réelle** : parce qu'un programme de rando à Hakone sous la pluie battante, ça se réorganise la veille, pas sur place.
+- **Suivi des prix de vols** : la partie qui m'a fait le plus suer, et j'y reviens.
+
+Tout part d'un fichier JSON qui décrit le voyage. L'app le lit, le rend, et je modifie l'itinéraire en éditant des données plutôt qu'en me battant avec des cellules fusionnées.
+
+## La galère des prix de vols
+
+Au départ, je suivais les prix via l'**API Amadeus**. C'est l'API de référence pour le voyage, sérieuse, bien documentée. J'avais branché leur endpoint de recherche de vols, je stockais les relevés, je traçais une petite courbe. Satisfait de moi.
+
+Puis je tombe sur l'annonce : leur **portail self-service est décommissionné en juillet 2026**. Donc l'accès gratuit/indé sur lequel je m'appuyais disparaît. C'est exactement le genre de dépendance externe qui te rappelle que ton projet perso n'est jamais aussi "à toi" que tu le crois — il repose sur les décisions business de quelqu'un d'autre.
+
+J'ai donc basculé sur **Travelpayouts**. La migration n'a pas été dramatique, et c'est là que payer le prix d'une bonne architecture dès le départ se rembourse. J'avais isolé l'accès aux prix derrière une seule fonction côté front, du genre :
+
+```ts
+// Un seul point d'entrée : le reste de l'app ne sait pas
+// quel fournisseur est derrière.
+async function fetchFlightPrice(route: Route): Promise<PricePoint> {
+  // Avant : appel Amadeus
+  // Après : appel Travelpayouts
+  // L'app, elle, s'en fiche.
+}
+```
+
+Le reste de l'app ne connaît que `PricePoint`. Changer de fournisseur, c'est réécrire l'intérieur de cette fonction, pas refactorer dix composants. C'est le genre de discipline qu'on applique au boulot sans réfléchir et qu'on a tendance à zapper sur un projet perso "vite fait" — à tort.
+
+**La leçon** : sur un projet perso aussi, isole tes dépendances externes derrière une frontière claire. Pas par perfectionnisme, par survie. Les API tierces changent, ferment, augmentent leurs tarifs. Ta frontière, c'est ton assurance.
+
+## Pourquoi fait maison plutôt qu'un outil existant
+
+La question est légitime. Il existe des dizaines d'apps de planification de voyage, certaines très bien faites. Pourquoi réinventer la roue ?
+
+Quelques raisons, honnêtes :
+
+- **Aucun outil ne correspondait exactement à mon besoin.** Je voulais l'itinéraire, la météo et les prix de vols réunis dans une seule vue, sans comptes à créer, sans pub, sans "passez à la version premium pour exporter".
+- **Mes données m'appartiennent.** Un JSON dans mon repo, pas un voyage piégé dans le cloud d'une startup qui peut fermer entre ma réservation et mon départ.
+- **C'est un terrain de jeu.** J'apprends mieux en construisant un truc que j'utilise vraiment. La pression d'un vrai voyage derrière fait un excellent product owner.
+
+Et soyons clairs : ce n'est pas "mieux" qu'un outil pro. C'est *à moi*, taillé pour *mon* cas. C'est suffisant, et c'est précisément le but.
+
+## La suite : décrire le voyage, l'IA construit le JSON
+
+Aujourd'hui, ce JSON est **construit en dur à la configuration de l'app** : un choix assumé pour aller vite et garder la main sur chaque donnée. Mais j'ai pris soin de me laisser la porte ouverte vers quelque chose de **complètement dynamique** — une **page de config qui appelle une IA**.
+
+Le principe : je décris le voyage en langage naturel — *"14 jours au Japon en famille, arrivée Tokyo, 3 nuits, puis Kyoto, Hakone, Osaka, avec un budget vol surveillé sur Paris-Tokyo"* — et l'IA me génère le JSON structuré que l'app sait déjà lire.
+
+Ce qui est élégant, c'est que l'app n'a pas besoin de bouger : elle consomme du JSON, point. L'IA devient juste un **générateur d'entrée** en amont. Le contrat de données reste le même, qu'il soit tapé par moi ou produit par un modèle. Encore une histoire de frontière propre.
+
+## Ce que je retiens
+
+Un projet perso utile bat un projet perso ambitieux qui ne sert à rien. trip-builder ne révolutionne pas le voyage, mais il m'a réellement servi à préparer le Japon, et il m'a re-rappelé deux ou trois choses que je sais en théorie : isoler ses dépendances externes, garder ses données proches de soi, et choisir un stack qu'on maîtrise pour passer son temps sur le problème, pas sur l'outillage.
+
+Et accessoirement, le tableur n'a pas gagné.

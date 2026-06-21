@@ -1,0 +1,102 @@
+---
+title: "Comment j'ai attrapé un client avec de la data (et pas un discours commercial)"
+slug: "refonte-site-couvreur"
+description: "Comment j'ai abordé un couvreur non pas avec un argumentaire, mais avec les chiffres de son propre site — et ce que ça change dans la façon de proposer un accompagnement."
+date: "2026-06-20"
+category: "projet"
+format: "article"
+tags: ["react", "seo", "performance", "vite", "freelance"]
+draft: false
+featured: true
+---
+
+Je n'ai pas démarché ce couvreur avec un argumentaire commercial. Je l'ai démarché avec **ses propres chiffres**.
+
+L'idée de départ est simple : plutôt que d'aller dire à un artisan « votre site mériterait un coup de neuf » — ce que tout le monde lui dit déjà — je suis allé chercher la donnée. J'ai passé son site existant au crible, j'ai sorti les vrais nombres, et ce sont eux qui ont ouvert la conversation. Pas mon avis : un constat mesurable.
+
+## La donnée comme porte d'entrée
+
+Première chose : mesurer. PageSpeed Insights, le site actuel, sur mobile, le terrain réel d'un client qui cherche un couvreur.
+
+Le verdict était sans appel :
+
+- **Score performance mobile : 45/100** (36 sur desktop).
+- **~19 Mo** chargés au premier affichage.
+- **LCP à ~24 secondes** : le temps avant que l'écran montre quelque chose d'utile.
+- Une page qui **saute dans tous les sens** pendant le chargement (CLS à 0,44).
+
+Traduit en langage métier : le client type est dehors, sur le réseau mobile, son téléphone à la main parce qu'il a une fuite. À 24 secondes d'attente, il est déjà reparti chez le couvreur d'à côté. Ces 24 secondes, ce ne sont pas un détail technique — ce sont des appels perdus.
+
+C'est ça, démarcher par la data : je n'arrive pas avec une opinion, j'arrive avec un chiffre que personne ne peut contester, et qui se traduit directement en euros.
+
+## La démo plutôt que le devis
+
+Le piège classique, c'est d'envoyer un devis et un PDF de promesses. J'ai fait l'inverse : **j'ai construit le site neuf avant d'en parler**, et je l'ai déployé sous mon propre domaine, sur un sous-chemin, pour qu'il puisse le voir tourner pour de vrai.
+
+Le même PageSpeed, sur ma version :
+
+- **Score performance mobile : 92/100** (100 sur desktop).
+- **~0,9 Mo** au premier affichage — environ **20 fois plus léger**.
+- **LCP à ~2,7 secondes**.
+- **CLS à 0** : plus aucun saut, la page est stable dès la première frame.
+
+La perf reste volontairement en filigrane dans la conversation avec l'artisan — lui, ce qui l'intéresse, c'est « est-ce que ça me ramène des clients ». Mais c'est elle qui rend la démo crédible : il ne me croit pas sur parole, il ouvre le site sur son téléphone et il *sent* la différence.
+
+## Les choix techniques, en deux mots
+
+Rien d'héroïque, et c'est volontaire :
+
+- **Statique, pré-rendu** (Vite + React + `vite-react-ssg`) : le HTML est généré au build, donc déjà complet quand le navigateur — ou Google — arrive. C'est ce qui sert à la fois la vitesse et le référencement.
+- **CSS pur, zéro framework UI** : sur un site de cette taille, une librairie de composants, c'est des dizaines de Ko dont on utilise 5 %. J'écris le CSS nécessaire, point.
+- **Déploiement statique** sur S3 + CloudFront : pas de serveur à maintenir, donc pas de site qui tombe un dimanche.
+
+Par-dessus, du **JSON-LD `RoofingContractor`** pour dire explicitement à Google « voici un couvreur, sa zone, ses horaires, son téléphone », et des **pages par ville** déjà câblées pour le SEO local. Tout le parcours est construit autour d'une seule action : **appeler** — barre d'action fixe sur mobile, bandeau urgence fuite, bouton toujours sous le pouce.
+
+## Le design : proposer, et l'illustrer
+
+Un artisan ne sait pas lire une maquette Figma. Donc je ne lui présente pas une maquette : je lui montre **plusieurs directions artistiques sur le vrai site**, qu'il peut comparer côte à côte.
+
+Techniquement, ça tient à un choix simple : j'ai **centralisé tout le thème** — couleurs et formes des composants — dans un seul fichier de tokens. Changer toute la direction artistique, c'est changer un objet, pas refaire le CSS.
+
+```ts
+// Un seul endroit pour la palette ET la forme des composants.
+// Changer de DA = changer ce preset, le reste du site suit.
+const theme = {
+  pierre:     { primary: '#574d44', accent: '#c2562f', page: '#f7f2ea' },
+  anthracite: { primary: '#2b2f33', accent: '#d98a3d', page: '#f4f5f6' },
+  ardoise:    { primary: '#3a4a5a', accent: '#c2562f', page: '#f5f7f9' },
+}
+```
+
+Je m'en sers pour **avoir la main en quelques secondes** sur la palette et l'allure générale, et donc pour proposer au client des variantes concrètes au lieu de descriptions. Au final, j'ai fui le bleu corporate par défaut : le métier, c'est la maison et la toiture, donc **pierre + tuile terracotta + crème**. Ça raconte le bon artisan, là où un bleu générique aurait dit « agence web random ».
+
+## Ne pas casser ce qu'on a promis
+
+Promettre 92/100, c'est facile le jour de la livraison. Le vrai risque, c'est dans six mois : on ajoute une photo non optimisée, un script, et la perf s'effondre sans que personne ne s'en aperçoive — jusqu'à ce que les appels baissent.
+
+Donc j'ai branché un **garde-fou dans le déploiement continu**. À chaque modification, avant la mise en ligne, **Lighthouse CI** rejoue les mesures et **fait échouer le déploiement** si la performance passe sous le seuil ou si la page dépasse son budget de poids.
+
+```yaml
+# Le déploiement est bloqué si on casse la promesse de perf.
+assert:
+  categories:performance: ['error', { minScore: 0.95 }]
+  total-byte-weight:      ['error', { maxNumericValue: 1500000 }]  # 1,5 Mo max
+```
+
+Concrètement : le site ne peut pas se dégrader en silence. Le pipeline le refuse. Pour un client, c'est la différence entre « un site rapide » et « un site qui *reste* rapide ».
+
+## L'accompagnement, pas juste un site
+
+C'est là que la démarche prend tout son sens. Je ne livre pas un fichier et je disparais — je propose un **accompagnement**, décliné en niveaux selon ce dont l'artisan a besoin :
+
+- **Le socle** : le site en ligne, rapide, trouvable, qui convertit.
+- **La visibilité** : suivi du référencement local, pages par ville, contenu.
+- **La sérénité** : surveillance continue des performances, mises à jour, et la garantie que la vitesse promise tient dans le temps.
+
+Le formulaire de devis est branché sur `svc-communication`, un micro-service que j'avais déjà construit pour mon propre site : une brique réutilisée plutôt qu'un envoi de mail recâblé. Moins de code, moins de surface de bug, déployé en quelques minutes.
+
+## Ce que j'en retiens
+
+La leçon n'est pas technique, elle est commerciale : **la donnée est le meilleur argument de vente**. Je n'ai pas eu à convaincre que le site était lent — PageSpeed l'a dit à ma place. Je n'ai pas eu à promettre que le mien était rapide — la démo l'a montré. Et je n'ai pas eu à jurer que ça tiendrait — le pipeline s'en charge.
+
+Pour un artisan, la performance n'est pas un détail de dev. C'est un argument commercial chiffrable. 20 fois plus léger, c'est 21 secondes d'attente en moins — et 21 secondes, c'est exactement le temps qu'il faut pour perdre un client.
