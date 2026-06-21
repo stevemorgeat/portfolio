@@ -81,6 +81,17 @@ article .ameta { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
 .prose .ph { margin: 22px 0; }
 .prose .ph img { display: block; width: 100%; border-radius: 12px; border: 1px solid var(--line); }
 .prose .ph figcaption { font-size: 12.5px; color: var(--muted); text-align: center; margin-top: 6px; font-style: italic; }
+/* échantillon de palettes (mini-mockups DA, CSS pur) */
+.prose .palettes { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin: 18px 0; }
+.prose .palettes figure { margin: 0; }
+.prose .pal-demo { height: 100px; padding: 10px; border: 1px solid var(--line); border-radius: 10px; display: flex; flex-direction: column; gap: 7px; background: var(--pg); }
+.prose .pal-bar { height: 16px; border-radius: 5px; background: var(--pp); }
+.prose .pal-line { height: 8px; width: 70%; border-radius: 4px; background: var(--pp); opacity: .35; }
+.prose .pal-btn { height: 14px; width: 48px; border-radius: 999px; background: var(--pa); margin-top: auto; }
+.prose .palettes figcaption { text-align: center; font-size: 12px; color: var(--muted); margin-top: 5px; font-style: normal; }
+.pal-pierre { --pp: #574d44; --pa: #c2562f; --pg: #f7f2ea; }
+.pal-anthracite { --pp: #2b2f33; --pa: #d98a3d; --pg: #f4f5f6; }
+.pal-ardoise { --pp: #3a4a5a; --pa: #c2562f; --pg: #f5f7f9; }
 .backlink { display: inline-block; margin-top: 8px; font-size: 14px; }
 
 /* galerie (photo-essai) */

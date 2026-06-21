@@ -93,6 +93,59 @@ Le fil rouge de ces trois bugs : **`serverless package` qui réussit ne prouve r
 
 Ce qui m'a débloqué, c'est d'arrêter de déployer pour tester. À la place : **dézipper le bundle et l'invoquer en local**, avec un event Lambda simulé, pour reproduire le comportement runtime réel avant de pousser quoi que ce soit. Les trois bugs se reproduisaient en local — il suffisait de regarder au bon endroit, pas dans les logs CloudWatch après un déploiement de plus.
 
+## SES : la config, et le coût réel
+
+Le provider d'email, aujourd'hui, c'est **Amazon SES** (Simple Email Service), et ce n'est pas un hasard : le service tourne déjà sur AWS, donc SES vit dans **le même compte, la même région (`eu-west-3`) et le même rôle** que ma Lambda. Aucune clé API d'un provider externe à stocker ni à faire tourner — la Lambda envoie grâce à son **rôle d'exécution**, point.
+
+L'adapter, justement, ne fait rien de plus que traduire ma notification en appel SES. Il implémente le port `EmailProvider` : le domaine ne sait même pas que SES existe derrière.
+
+```ts
+// adapters/outbound/email/providers/ses-email-provider.ts
+export class SesEmailProvider implements EmailProvider {
+  readonly name = 'ses'
+  // pas de clé : un client vide → il utilise le rôle d'exécution de la Lambda
+  constructor(private readonly ses = new SESClient({})) {}
+
+  async sendEmail(msg: EmailMessage): Promise<void> {
+    await this.ses.send(new SendEmailCommand({
+      Source: msg.from, // mon adresse vérifiée
+      Destination: { ToAddresses: [msg.to] },
+      ReplyToAddresses: msg.replyTo ? [msg.replyTo] : undefined, // → le visiteur
+      Message: {
+        Subject: { Data: msg.subject },
+        Body: { Html: { Data: msg.html }, Text: { Data: msg.text } },
+      },
+    }))
+  }
+}
+```
+
+Une trentaine de lignes, zéro logique métier : c'est tout l'intérêt du port. Le jour où je passe à Brevo, j'écris un `BrevoEmailProvider` à côté, et le domaine ne bouge pas d'un poil.
+
+Côté permissions, c'est le strict minimum :
+
+```yaml
+# serverless.yml — le seul droit dont la Lambda a besoin
+iamRoleStatements:
+  - Effect: Allow
+    Action: ses:SendEmail
+    Resource: "*" # le propre : restreindre à l'ARN de l'identité vérifiée
+```
+
+La config SES elle-même tient en trois points :
+
+- **Vérifier une identité d'envoi.** SES n'envoie pas depuis n'importe quelle adresse : il faut prouver qu'on possède le domaine (ou l'adresse) expéditeur via des enregistrements DNS **DKIM/SPF**. C'est aussi ce qui évite d'atterrir tout droit en spam.
+- **Sortir du bac à sable.** Un compte SES neuf est en **sandbox** : envoi limité à des adresses vérifiées, avec un quota minuscule. Pour un vrai formulaire public, on demande l'**accès production**. (Pour un form qui ne fait que *m'écrire à moi*, une identité vérifiée suffit même en sandbox.)
+- **Le détail malin** : je mets l'email du visiteur en **`Reply-To`**. Le mail part de mon adresse vérifiée (pour passer les filtres), mais quand je clique « Répondre », ça file **directement au visiteur**.
+
+### Le prix (le vrai argument)
+
+C'est là que SES écrase la concurrence pour mon cas : **0,10 $ pour 1 000 emails**. Pas d'abonnement, pas de palier — et **3 000 emails/mois gratuits la première année**.
+
+Un formulaire de contact, ça envoie quelques dizaines de mails par mois au grand maximum. Mon coût réel est donc **arrondi à zéro**. Là où un SendGrid ou un Mailchimp imposent un forfait mensuel pour le même service, SES facture des fractions de centime. Pour de la notification transactionnelle à bas volume, il n'y a pas match.
+
+Et le jour où j'ai besoin de mieux (analytics, délivrabilité marketing, templates managés), l'archi en **ports & adapters** me laisse basculer sur Brevo sans toucher au domaine : l'adaptateur SES n'est qu'une implémentation parmi d'autres.
+
 ## Sécuriser un endpoint public sans auth
 
 Un formulaire de contact, c'est public par définition : pas de login, pas de token. Donc défense en profondeur, plusieurs couches qui se complètent :
