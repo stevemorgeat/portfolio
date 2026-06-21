@@ -1,0 +1,137 @@
+---
+title: "J'ai fait tourner un bâtiment en 3D sur mon site sans comprendre comment — alors j'ai ouvert le capot"
+slug: "modele-3d-react-three-fiber-sous-le-capot"
+description: "React Three Fiber, j'ai copié-collé de la 3D qui marche sans saisir ce qui se passe sous le canvas. Cette fois j'ouvre le capot : scène, caméra, renderer, et ce que React cache vraiment."
+date: "2026-06-21"
+category: "techno"
+format: "article"
+tags: ["react", "three", "webgl", "3d"]
+draft: false
+---
+
+Sur l'ancienne version de mon site, il y avait un bâtiment en 3D qui tournait tout seul — une école, modélisée, qu'on pouvait faire pivoter à la souris. J'avais branché ça avec **React Three Fiber**, et honnêtement : j'avais copié-collé des bouts qui marchaient sans vraiment comprendre ce qui se passait sous le `<canvas>`.
+
+Ça me restait en travers. Alors avant de retirer ce modèle du nouveau site, j'ai pris le temps de **vraiment** comprendre la mécanique. Voici ce que j'aurais aimé qu'on m'explique au début.
+
+## Sous le capot : la trinité scène / caméra / renderer
+
+Toute la 3D temps réel dans un navigateur repose sur **WebGL** — une API qui parle au GPU. Three.js est une couche au-dessus qui rend WebGL utilisable par des humains. Et tout, absolument tout, tourne autour de **trois objets** :
+
+```ts
+// La 3D, c'est toujours ces trois-là, même dans un moteur de jeu AAA.
+const scene = new Scene() // le "monde" : tout ce qui existe vit dedans
+const camera = new PerspectiveCamera(fov, aspect, near, far) // ton œil
+const renderer = new WebGLRenderer({ canvas }) // celui qui peint sur l'écran
+
+renderer.render(scene, camera) // "prends une photo de la scène avec cette caméra"
+```
+
+La **scène**, c'est le décor : un graphe d'objets. La **caméra**, c'est d'où tu regardes (avec son `fov`, son champ de vision). Le **renderer**, c'est l'ouvrier qui transforme « cette scène vue par cette caméra » en pixels sur le `<canvas>`. Retiens ça et 80 % du mystère tombe.
+
+## La boucle de rendu : sinon, rien ne bouge
+
+`renderer.render()` peint **une** image. Pour que ça vive — que le bâtiment tourne — il faut repeindre 60 fois par seconde :
+
+```ts
+function loop() {
+  building.rotation.y += 0.01 // on bouge un truc
+  renderer.render(scene, camera) // on re-photographie
+  requestAnimationFrame(loop) // "rappelle-moi à la prochaine frame"
+}
+loop()
+```
+
+C'est exactement la boucle d'un jeu vidéo : *mettre à jour l'état → dessiner → recommencer*. Sans cette boucle, ton image est figée. Avec, elle s'anime.
+
+## Un objet = géométrie + matériau (+ de la lumière, sinon c'est noir)
+
+Un objet visible (un **mesh**) n'est rien d'autre que deux choses collées ensemble :
+
+```ts
+const geometry = new BoxGeometry(1, 1, 1) // la FORME (des sommets dans l'espace)
+const material = new MeshStandardMaterial({ color: 'tomato' }) // la PEAU (couleur, reflets)
+const cube = new Mesh(geometry, material)
+scene.add(cube)
+```
+
+Le piège classique du débutant (le mien) : tu ajoutes ton cube, et **tout est noir**. Normal : un `MeshStandardMaterial` réagit à la lumière, et tu n'en as mis aucune. Pas de lumière, pas de photo.
+
+```ts
+scene.add(new AmbientLight(0xffffff, 1)) // lumière douce, partout
+scene.add(new DirectionalLight(0xffffff, 1.5)) // un "soleil" qui crée les ombres
+```
+
+## Et là, React entre en scène
+
+Tout ce qui précède, c'est de l'**impératif** : tu crées des objets, tu les ajoutes, tu gères la boucle à la main. React Three Fiber (R3F) fait un pari malin : et si on décrivait la scène 3D **en JSX**, comme un DOM ?
+
+```tsx
+// Chaque balise EST un vrai objet Three.js inséré dans la scène.
+// <Canvas> crée pour toi la scène, la caméra, le renderer ET la boucle.
+<Canvas camera={{ position: [8, 5, 10], fov: 45 }}>
+  <ambientLight intensity={1} />
+  <directionalLight position={[8, 12, 6]} intensity={1.5} />
+  <mesh>
+    <boxGeometry args={[1, 1, 1]} />
+    <meshStandardMaterial color="tomato" />
+  </mesh>
+</Canvas>
+```
+
+C'est *le même code* qu'au-dessus, mais déclaratif. `<mesh>` crée un `Mesh`, `<boxGeometry>` devient sa géométrie, `<ambientLight>` une `AmbientLight`… R3F est un **moteur de rendu React** (un *reconciler*) qui, au lieu de produire des `<div>`, produit des objets Three.js et les branche dans le graphe de scène. La boucle `requestAnimationFrame` ? Gérée par `<Canvas>`. C'est ça, le tour de magie — et c'est ça que je ne voyais pas.
+
+## Charger un vrai modèle : le format glTF/GLB
+
+Mon bâtiment n'est pas un cube : c'est un fichier `.glb`. Un **glTF** (`.glb` = sa version binaire compacte), c'est en gros « le JPEG de la 3D » : un graphe de scène complet — meshes, matériaux, textures, hiérarchie — packagé dans un seul fichier.
+
+Le charger est **asynchrone** (le fichier pèse lourd), donc on s'appuie sur le `Suspense` de React :
+
+```tsx
+function School() {
+  // useGLTF télécharge + parse le .glb, et "suspend" tant que ce n'est pas prêt
+  const { scene } = useGLTF('/school.glb')
+  // <primitive> = "insère cet objet Three.js déjà construit, tel quel"
+  return <primitive object={scene} />
+}
+
+<Suspense fallback={<Html center>Chargement du modèle 3D…</Html>}>
+  <School />
+</Suspense>
+```
+
+Le `fallback` s'affiche pendant le téléchargement, puis React remplace par le modèle. Pas de `loading state` à câbler à la main — c'est Suspense qui orchestre.
+
+## Bouger autour : OrbitControls et le repère
+
+Reste à pouvoir tourner autour. Dans l'espace 3D, une position est un triplet `[x, y, z]` ; ma caméra était à `[8, 5, 10]` (à droite, en hauteur, en recul). **OrbitControls** transforme les gestes souris/tactiles en mouvements de caméra :
+
+```tsx
+<OrbitControls
+  autoRotate // le bâtiment pivote tout seul
+  autoRotateSpeed={0.8}
+  enablePan={false} // pas de déplacement latéral, juste tourner/zoomer
+  makeDefault
+/>
+```
+
+Détail que j'avais mis sans comprendre : `autoRotate` ne tourne pas le bâtiment, il fait **tourner la caméra autour** de lui. Le résultat à l'écran est le même, mais conceptuellement c'est l'œil qui bouge, pas le décor. Ce genre de nuance, c'est exactement ce qui te bloque pendant une heure quand tu ne l'as pas en tête.
+
+## drei, ou comment ne pas réinventer la roue
+
+Dans mon code, j'utilisais aussi `Bounds`, `Center`, `Html` — ça vient de **drei**, une boîte à outils de helpers pour R3F. Sans elle, centrer et cadrer pile un modèle de taille inconnue, c'est des maths de caméra. Avec :
+
+```tsx
+<Bounds fit clip observe margin={1.2}> {/* cadre auto le modèle dans la vue */}
+  <Center> {/* recentre son point d'origine */}
+    <School />
+  </Center>
+</Bounds>
+```
+
+`Html`, lui, permet d'afficher du **vrai HTML** (mon texte de chargement) positionné dans la scène 3D. drei, c'est 90 % des galères courantes déjà résolues.
+
+## Ce que j'en retiens
+
+React Three Fiber ne te dispense pas de comprendre Three.js — il le **cache**, ce qui est très différent. Tant que ça marche, tu surfes. Le jour où c'est noir, où le modèle est hors-champ ou invisible, tu es perdu si tu n'as pas la trinité **scène / caméra / renderer / lumière** en tête.
+
+Maintenant que je l'ai, je l'assume : j'ai **retiré** le bâtiment du nouveau site. Une école qui tourne, c'est joli, mais ça ne servait aucun visiteur et ça pesait près de 8 Mo. Le bon réflexe, ce n'est pas de mettre de la 3D parce qu'on sait faire — c'est de comprendre la techno **assez** pour décider, en connaissance de cause, de ne pas s'en servir. Le sujet, lui, je le garde sous le coude : la prochaine fois que la 3D aura un vrai rôle, je ne copierai plus à l'aveugle.

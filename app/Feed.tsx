@@ -24,7 +24,7 @@ const DOMAIN_COLOR: Record<string, string> = {
   meta: '#1f8a5b', // seo, perf, freelance — couleur de base du site
 }
 const TAG_DOMAIN: Record<string, keyof typeof DOMAIN_COLOR> = {
-  react: 'front', vite: 'front', mui: 'front', typescript: 'front',
+  react: 'front', vite: 'front', mui: 'front', typescript: 'front', three: 'front', webgl: 'front', '3d': 'front',
   aws: 'cloud', nestjs: 'cloud', serverless: 'cloud', fastify: 'cloud',
   japon: 'voyage', voyage: 'voyage',
   photo: 'photo',
