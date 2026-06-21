@@ -70,7 +70,22 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       <div className="prose">
         <MDXRemote source={post.content} options={mdxOptions} />
       </div>
-      {post.format === 'gallery' && (
+      {post.format === 'gallery' && post.layout === 'manga' && (
+        <div className="manga">
+          <div className="manga-kicker">第一話 · Carnet de voyage</div>
+          <div className="manga-grid">
+            {post.images.map((img, i) => (
+              <div className={`mcell ${img.size ?? 'sq'}`} key={i}>
+                <img src={img.src} alt={img.caption ?? post.title} loading="lazy" />
+                {img.narration && <div className={`narr ${img.pos ?? 'bl'}`}>{img.narration}</div>}
+                {img.sfx && <div className={`sfx ${img.sfxPos ?? 'r'}`}>{img.sfx}</div>}
+              </div>
+            ))}
+          </div>
+          <div className="manga-foot">— à lire de droite à gauche —</div>
+        </div>
+      )}
+      {post.format === 'gallery' && post.layout !== 'manga' && (
         <div className="gallery">
           {post.images.map((img, i) => (
             <figure key={i}>

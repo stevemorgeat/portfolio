@@ -39,7 +39,22 @@ export const frontmatterSchema = z.discriminatedUnion('format', [
   base
     .extend({
       format: z.literal('gallery'),
-      images: z.array(z.object({ src: z.string(), caption: z.string().optional() })).min(1),
+      // 'grid' = galerie classique ; 'manga' = planche lue de droite à gauche.
+      layout: z.enum(['grid', 'manga']).default('grid'),
+      images: z
+        .array(
+          z.object({
+            src: z.string(),
+            caption: z.string().optional(),
+            // Champs manga (optionnels) : taille de case, bulle de narration et onomatopée.
+            size: z.enum(['wide', 'tall', 'sq']).optional(),
+            narration: z.string().optional(),
+            pos: z.enum(['tl', 'bl']).optional(),
+            sfx: z.string().optional(),
+            sfxPos: z.enum(['r', 't']).optional(),
+          }),
+        )
+        .min(1),
     })
     .strict(),
 ])
