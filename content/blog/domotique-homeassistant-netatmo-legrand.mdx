@@ -1,68 +1,77 @@
 ---
-title: "J'ai donné un cerveau à ma maison avec 3 marques qui ne se parlent pas"
+title: "J'ai mis ma maison sur un Raspberry Pi — et je refuse qu'elle dépende d'internet"
 slug: "domotique-homeassistant-netatmo-legrand"
-description: "Retour d'expérience sur ma domotique perso : HomeAssistant en cerveau, Netatmo et Legrand branchés dessus."
+description: "Ma domotique perso : HomeAssistant sur Raspberry Pi en cerveau, du Céliane et du Zigbee en local. J'ai commencé par le cerveau, pas par les gadgets."
 date: "2026-05-10"
 category: "note"
 format: "article"
 tags: ["domotique", "homeassistant", "netatmo", "legrand", "maison"]
-draft: true
+draft: false
 ---
 
-J'ai un principe simple en domotique : je veux que ma maison m'obéisse, pas que j'obéisse à trois apps différentes. Au départ j'avais l'app Netatmo d'un côté, l'app Legrand de l'autre, et entre les deux... rien. Chaque marque dans son coin, chaque routine impossible à croiser. C'est exactement le genre de friction qui me sort de mes gonds — alors j'ai mis HomeAssistant au centre.
+J'ai un principe simple en domotique : je veux que ma maison m'obéisse, pas l'inverse. Et j'ai un deuxième principe, plus fort encore : un interrupteur qui ne marche que si internet est debout, ce n'est pas un interrupteur — c'est un pari. Alors j'ai construit l'inverse : un cerveau local, à la maison, qui ne demande la permission à personne.
 
-Voici comment c'est foutu, ce qui marche, et ce que je referais autrement.
+Voici comment c'est foutu aujourd'hui, et — surtout — pourquoi je suis volontairement encore au début.
 
-## Pourquoi HomeAssistant comme cerveau
+## J'ai commencé par le cerveau, pas par les gadgets
 
-Le piège classique de la domotique, c'est de se laisser enfermer dans l'écosystème d'un fabricant. Tu achètes du Netatmo, tu vis dans l'app Netatmo. Tu ajoutes du Legrand, tu jongles avec une deuxième app. Et le jour où tu veux une règle du type « si la température baisse ET qu'il est plus de 22h, alors... », tu te rends compte qu'aucune des deux apps ne sait parler à l'autre.
+Le réflexe classique, c'est d'acheter une ampoule connectée, puis une prise, puis un capteur, et de se retrouver six mois plus tard avec cinq apps qui ne se parlent pas. J'ai fait l'inverse : j'ai d'abord posé le **cerveau**, puis j'y ai branché des choses.
 
-HomeAssistant résout ça parce qu'il est :
+Ce cerveau, c'est **HomeAssistant**, qui tourne sur un simple **Raspberry Pi** chez moi. Le choix tient en trois mots :
 
-- **Ouvert** : open source, communauté énorme, tu n'es l'otage de personne.
-- **Agnostique** : il intègre des centaines de marques. Netatmo et Legrand deviennent juste des *sources de données et d'actions* parmi d'autres, sous un même toit.
-- **Local d'abord** : une grande partie tourne chez moi, pas dans un cloud que quelqu'un peut décider d'éteindre. Pour un dev, c'est aussi rassurant que satisfaisant.
+- **Local d'abord.** L'essentiel tourne sur le Pi, pas dans un cloud que quelqu'un peut décider d'éteindre. Pour un dev, c'est aussi rassurant que satisfaisant.
+- **Ouvert.** Open source, communauté énorme, je ne suis l'otage d'aucun fabricant.
+- **Agnostique.** Chaque marque devient juste une *source de données et d'actions* sous un même toit. Une seule interface, une seule logique.
 
-En gros, je suis passé de « plusieurs apps qui ne se parlent pas » à « un seul endroit où je vois tout et je décide de tout ». Pour quelqu'un qui code des systèmes toute la journée, retrouver cette logique de *single source of truth* à la maison, ça fait du bien.
+C'est exactement la mentalité que j'applique au boulot : une *single source of truth*, et tout le reste qui s'y branche. Sauf qu'ici, le système, c'est mon salon.
 
-Je le fais tourner sur [À compléter par Steve — Raspberry Pi ? mini-PC ? NUC ? HA Green/Yellow ?].
+## Le local-first, en vrai
 
-## Comment Netatmo s'intègre
+Mes interrupteurs et mes prises, c'est du **Céliane with Netatmo** (Legrand). Le détail qui a tout décidé pour moi : **ils continuent de fonctionner même sans internet**. La box tombe, le wifi rame, le cloud du fabricant est en maintenance — la lumière s'allume quand même, depuis l'interrupteur mural, comme un interrupteur normal.
 
-Netatmo passe par une intégration officielle dans HomeAssistant. Concrètement, mes appareils Netatmo remontent dans HA comme des entités que je peux lire et piloter.
+Ça paraît évident dit comme ça. Ça ne l'est pas : une bonne partie du matériel « connecté » du marché devient une brique morte le jour où le serveur distant ne répond plus. Moi, je refuse ce compromis sur les fonctions de base d'une maison.
 
-Côté Netatmo j'ai [À compléter par Steve — station météo ? thermostat ? vannes ? caméras ? détecteurs ?]. Une fois l'intégration en place, leurs mesures (température, [À compléter par Steve]) et leurs contrôles deviennent disponibles dans HA.
+À côté, j'ai commencé à ajouter du **Zigbee** — notamment des **sondes de température IKEA**, pas chères et locales. Elles remontent dans HomeAssistant comme n'importe quelle autre entité, et je vois enfin la température pièce par pièce au même endroit que le reste.
 
-Un point d'honnêteté : l'intégration Netatmo passe historiquement par leur **cloud / OAuth**, donc ce bout-là n'est pas 100 % local. C'est le compromis que j'ai accepté pour ces appareils précis. [À compléter par Steve si setup local spécifique].
+## Ce qui tourne déjà
 
-## Comment Legrand s'intègre
+Je ne pars pas de zéro. Deux choses me servent tous les jours :
 
-Côté Legrand, j'ai [À compléter par Steve — gamme exacte : Céliane with Netatmo ? MyHome ? Drivia ? interrupteurs connectés ? volets ?]. Là encore, ça remonte dans HomeAssistant via [À compléter par Steve — intégration officielle Legrand/Home + Control ? autre ?], ce qui me permet de piloter [À compléter par Steve — éclairages ? prises ? volets ?] depuis la même interface que le reste.
+- **La voix.** D'abord pour le fainéant en moi — éteindre, allumer, sans bouger du canapé. Mais surtout pour le geste que je faisais mal avant : **tout éteindre en partant**, quand il n'y a plus personne. Une phrase, et la maison se met en veille.
+- **Les alertes.** J'ai équipé en capteurs d'ouverture la **porte principale, le garage et la porte du jardin (patio)** : si l'une reste ouverte, je le sais. Et avec les sondes de température, je reçois une **alerte chaleur ou froid** quand une pièce sort des clous.
 
-Détail amusant : une partie de la gamme connectée Legrand est en fait construite *avec* Netatmo. Les deux mondes sont donc moins étanches qu'ils en ont l'air — mais ça ne dispense pas d'un chef d'orchestre au-dessus, et c'est là que HA reprend la main.
+Ce sont des automatisations utiles, pas des gadgets : de la sécurité et de l'économie d'énergie, sans rien avoir à penser.
 
-## Ce qui marche bien
+Concrètement, une alerte porte, dans HomeAssistant, c'est quatre lignes :
 
-- **Tout au même endroit.** Un seul dashboard, une seule app sur le téléphone, plus de jonglage. C'est le bénéfice numéro un, et de loin.
-- **Les automatisations croisées.** Le vrai déclic, c'est quand une règle mélange les marques : un capteur Netatmo qui déclenche une action Legrand. Impossible sans HA. [À compléter par Steve — exemple concret d'automatisation préférée].
-- **La maîtrise.** Je vois l'historique, je trace les états, je débogue comme un système que je connais. Mentalité de dev appliquée au salon.
-- **L'extensibilité.** Ajouter une nouvelle marque plus tard ne casse rien : ça s'ajoute, ça ne se remplace pas.
+```yaml
+# Si la porte du garage reste ouverte plus de 5 min : on me prévient.
+trigger:  { platform: state, entity_id: binary_sensor.garage, to: "on", for: "00:05:00" }
+action:   { service: notify.mobile, data: { message: "Garage resté ouvert 🚪" } }
+```
 
-## Ce que je referais autrement
+## Ma cible : la tablette familiale comme hub
 
-- **Réfléchir au local vs cloud AVANT d'acheter.** Certaines intégrations dépendent du cloud du fabricant. Si je recommençais, je vérifierais ce point pour chaque appareil avant de sortir la carte bleue, pas après. [À compléter par Steve — frustration cloud précise ?]
-- **Standardiser le protocole.** Mélanger des écosystèmes propriétaires, ça marche, mais à refaire je regarderais de plus près [À compléter par Steve — Zigbee / Matter / Thread ?] pour réduire la dépendance aux ponts de chaque marque.
-- **Documenter mes automatisations.** Comme pour du code : six mois plus tard, on ne se souvient plus pourquoi une règle existe. [À compléter par Steve si tu tiens une doc / un repo de config].
-- **Ne pas tout vouloir automatiser le premier week-end.** J'ai voulu en faire trop, trop vite. [À compléter par Steve].
+Le piège que je veux éviter : un truc que seul moi sais utiliser. Donc le cap, c'est une **tablette murale** qui devient le **centre de la maison** pour toute la famille :
 
-## Conseils si tu te lances
+- les **automatisations** et l'état de la maison, à portée de doigt ;
+- un **agenda partagé** et une **todo partagée**, là où tout le monde passe ;
+- la **maison intelligente** rendue lisible : températures, alertes portes, chaleur/froid — sans ouvrir une app ni rien comprendre à HomeAssistant.
 
-1. **Commence par le cerveau, pas par les gadgets.** Installe HomeAssistant d'abord, ajoute un seul appareil, comprends la logique entités/automatisations. Ensuite tu étends.
-2. **Vérifie l'intégration avant d'acheter.** Un produit « connecté » n'est pas forcément bien intégré à HA. La doc et le forum de la communauté sont tes amis.
-3. **Privilégie le local quand tu peux.** Moins de dépendance au cloud = moins de surprises le jour où un service ferme ou tombe.
-4. **Va doucement sur les automatisations.** Une règle qui marche vaut mieux que dix règles à moitié cassées. Itère.
-5. **Accepte que c'est un projet vivant.** Ça ne sera jamais « fini ». C'est aussi ça qui est sympa.
+La domotique réussie, ce n'est pas celle qui impressionne. C'est celle que la famille utilise sans même savoir qu'il y a un Raspberry Pi derrière.
 
-## En résumé
+## Ce qui manque encore
 
-HomeAssistant au centre, Netatmo et Legrand branchés dessus : je suis passé d'une collection d'apps isolées à une vraie maison cohérente que je pilote comme un système. Ce n'est pas parfait — le cloud de certains fabricants reste un compromis — mais le confort d'avoir un seul cerveau ouvert et agnostique vaut largement le temps investi. Et honnêtement, appliquer mes réflexes de dev à ma propre maison, c'est un plaisir coupable que j'assume.
+Honnêteté de dev : il me reste les **automatisations de confort**, celles qui croisent les briques. Et là, je bute sur du concret :
+
+- Pas encore de **volets connectés** (Legrand) — ce sont eux qui débloqueront les vraies routines horaire/soleil.
+- J'ai laissé mon **thermostat Nest** dans mon ancien appartement. Avec ma chaudière actuelle, j'hésite : je dois d'abord vérifier ce qu'elle propose avant d'ajouter un thermostat on/off connecté.
+- **Ça coûte cher, et ça prend du temps.** La domotique, c'est un poste de dépense qui s'étale et un projet qui se monte par couches. Vouloir tout faire d'un coup, c'est le meilleur moyen de tout faire mal.
+
+La feuille de route, dans l'ordre : **volets** → **thermostat** (après vérif chaudière) → **plus de capteurs** Zigbee → **automatisations croisées** (une sonde qui ferme un volet ou lance le chauffage) → **déclencheurs NFC** (un tag qu'on scanne pour lancer une scène). Le genre de détail qui rend la maison tangible.
+
+## Ce que je retiens
+
+Commence par le cerveau, pas par les gadgets. Choisis du matériel qui **marche en local** pour les fonctions vitales. Et accepte que ce ne sera jamais « fini » — c'est un projet vivant, qui se monte par couches, au rythme du budget et du temps.
+
+Appliquer mes réflexes de dev à ma propre maison — un socle propre avant les features, le local avant le cloud, l'utilisateur (ici, la famille) avant la démo — c'est un plaisir coupable que j'assume totalement.
