@@ -29,6 +29,8 @@ C'est exactement la mentalité que j'applique au boulot : une *single source of 
 
 Mes interrupteurs et mes prises, c'est du **Céliane with Netatmo** (Legrand). Le détail qui a tout décidé pour moi : **ils continuent de fonctionner même sans internet**. La box tombe, le wifi rame, le cloud du fabricant est en maintenance — la lumière s'allume quand même, depuis l'interrupteur mural, comme un interrupteur normal.
 
+<figure className="ph"><img src="/gallery/domo-interrupteur.webp" alt="Interrupteur Céliane with Netatmo en cours de pose, câblage apparent" loading="lazy" /><figcaption>Un interrupteur Céliane with Netatmo, en cours de pose. Connecté, mais qui marche même sans box.</figcaption></figure>
+
 Ça paraît évident dit comme ça. Ça ne l'est pas : une bonne partie du matériel « connecté » du marché devient une brique morte le jour où le serveur distant ne répond plus. Moi, je refuse ce compromis sur les fonctions de base d'une maison.
 
 À côté, j'ai commencé à ajouter du **Zigbee** — notamment des **sondes de température IKEA**, pas chères et locales. Elles remontent dans HomeAssistant comme n'importe quelle autre entité, et je vois enfin la température pièce par pièce au même endroit que le reste.
@@ -41,6 +43,8 @@ Je ne pars pas de zéro. Deux choses me servent tous les jours :
 - **Les alertes.** J'ai équipé en capteurs d'ouverture la **porte principale, le garage et la porte du jardin (patio)** : si l'une reste ouverte, je le sais. Et avec les sondes de température, je reçois une **alerte chaleur ou froid** quand une pièce sort des clous.
 
 Ce sont des automatisations utiles, pas des gadgets : de la sécurité et de l'économie d'énergie, sans rien avoir à penser.
+
+<figure className="ph"><img src="/gallery/domo-sonnette.webp" alt="Sonnette connectée en cours d'installation" loading="lazy" /><figcaption>La sonnette connectée — branchée dans le même cerveau que le reste.</figcaption></figure>
 
 Concrètement, une alerte porte, dans HomeAssistant, c'est quatre lignes :
 
@@ -65,8 +69,10 @@ La domotique réussie, ce n'est pas celle qui impressionne. C'est celle que la f
 Honnêteté de dev : il me reste les **automatisations de confort**, celles qui croisent les briques. Et là, je bute sur du concret :
 
 - Pas encore de **volets connectés** (Legrand) — ce sont eux qui débloqueront les vraies routines horaire/soleil.
-- J'ai laissé mon **thermostat Nest** dans mon ancien appartement. Avec ma chaudière actuelle, j'hésite : je dois d'abord vérifier ce qu'elle propose avant d'ajouter un thermostat on/off connecté.
+- Le **chauffage**. J'ai bien un **thermostat Frisquet** (celui de la chaudière) qui fait très bien son job — mais il **ne parle pas encore à HomeAssistant**. J'avais un Nest dans mon ancien appart ; avant d'en remettre un, je veux voir si je peux plutôt **intégrer le Frisquet** ou piloter la chaudière proprement, sans superposer deux systèmes.
 - **Ça coûte cher, et ça prend du temps.** La domotique, c'est un poste de dépense qui s'étale et un projet qui se monte par couches. Vouloir tout faire d'un coup, c'est le meilleur moyen de tout faire mal.
+
+<figure className="ph"><img src="/gallery/domo-thermostat.webp" alt="Thermostat Frisquet mural affichant 20°C" loading="lazy" /><figcaption>Le thermostat Frisquet de la chaudière : efficace, mais pas encore relié au cerveau.</figcaption></figure>
 
 La feuille de route, dans l'ordre : **volets** → **thermostat** (après vérif chaudière) → **plus de capteurs** Zigbee → **automatisations croisées** (une sonde qui ferme un volet ou lance le chauffage) → **déclencheurs NFC** (un tag qu'on scanne pour lancer une scène). Le genre de détail qui rend la maison tangible.
 
