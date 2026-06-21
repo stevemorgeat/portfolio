@@ -93,6 +93,10 @@ article .ameta { font-size: 13px; color: var(--muted); margin-bottom: 22px; }
 .pal-anthracite { --pp: #2b2f33; --pa: #d98a3d; --pg: #f4f5f6; }
 .pal-ardoise { --pp: #3a4a5a; --pa: #c2562f; --pg: #f5f7f9; }
 .backlink { display: inline-block; margin-top: 8px; font-size: 14px; }
+/* page 404 */
+.notfound { text-align: center; padding: 70px 0 90px; }
+.notfound h1 { font-family: ui-serif, Georgia, serif; font-size: 64px; margin: 0 0 8px; color: var(--green); }
+.notfound p { color: var(--muted); margin: 0 0 18px; }
 
 /* galerie (photo-essai) */
 .gallery { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 18px 0; }
