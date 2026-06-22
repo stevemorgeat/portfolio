@@ -1,0 +1,4 @@
+# Les articles MDX sont du contenu rédactionnel (documentation), pas du code applicatif.
+# Exclus des statistiques de langage GitHub → le repo s'affiche en TypeScript.
+*.mdx linguist-documentation
+content/** linguist-documentation
