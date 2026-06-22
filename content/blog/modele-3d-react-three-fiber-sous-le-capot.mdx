@@ -116,6 +116,10 @@ Reste à pouvoir tourner autour. Dans l'espace 3D, une position est un triplet `
 
 Détail que j'avais mis sans comprendre : `autoRotate` ne tourne pas le bâtiment, il fait **tourner la caméra autour** de lui. Le résultat à l'écran est le même, mais conceptuellement c'est l'œil qui bouge, pas le décor. Ce genre de nuance, c'est exactement ce qui te bloque pendant une heure quand tu ne l'as pas en tête.
 
+Assez de théorie — voici tout ça réuni, en vrai, dans cette page :
+
+<ThreeDemo />
+
 ## drei, ou comment ne pas réinventer la roue
 
 Dans mon code, j'utilisais aussi `Bounds`, `Center`, `Html` — ça vient de **drei**, une boîte à outils de helpers pour R3F. Sans elle, centrer et cadrer pile un modèle de taille inconnue, c'est des maths de caméra. Avec :
@@ -134,4 +138,6 @@ Dans mon code, j'utilisais aussi `Bounds`, `Center`, `Html` — ça vient de **d
 
 React Three Fiber ne te dispense pas de comprendre Three.js — il le **cache**, ce qui est très différent. Tant que ça marche, tu surfes. Le jour où c'est noir, où le modèle est hors-champ ou invisible, tu es perdu si tu n'as pas la trinité **scène / caméra / renderer / lumière** en tête.
 
-Maintenant que je l'ai, je l'assume : j'ai **retiré** le bâtiment du nouveau site. Une école qui tourne, c'est joli, mais ça ne servait aucun visiteur et ça pesait près de 8 Mo. Le bon réflexe, ce n'est pas de mettre de la 3D parce qu'on sait faire — c'est de comprendre la techno **assez** pour décider, en connaissance de cause, de ne pas s'en servir. Le sujet, lui, je le garde sous le coude : la prochaine fois que la 3D aura un vrai rôle, je ne copierai plus à l'aveugle.
+Maintenant que je l'ai, je l'assume : j'ai **retiré** le bâtiment du nouveau site. Une école qui tourne, c'est joli, mais ça ne servait aucun visiteur et ça pesait près de 8 Mo. Le bon réflexe, ce n'est pas de mettre de la 3D parce qu'on sait faire — c'est de comprendre la techno **assez** pour décider, en connaissance de cause, où s'en servir.
+
+Et le bon endroit, c'est ici : le nœud vert plus haut pèse quelques Ko, ne se charge que sur cette page, et illustre exactement le propos. Un modèle de 8 Mo sur un site marketing : non. Une démo procédurale dans l'article qui l'explique : oui. La 3D au bon endroit, quoi. La prochaine fois qu'elle aura un vrai rôle, je ne copierai plus à l'aveugle.

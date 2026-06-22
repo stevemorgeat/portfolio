@@ -6,6 +6,10 @@ import remarkGfm from 'remark-gfm'
 import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import { getAllPosts, getPostBySlug } from '../../../lib/posts'
+import { ThreeDemo } from '../../../components/ThreeDemo'
+
+// Composants custom utilisables dans le MDX (ex. <ThreeDemo /> dans l'article 3D).
+const mdxComponents = { ThreeDemo }
 
 const SITE = 'https://stevemorgeat.fr'
 
@@ -68,7 +72,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {post.tags.length > 0 && <> · {post.tags.map((t) => `#${t}`).join(' ')}</>}
       </div>
       <div className="prose">
-        <MDXRemote source={post.content} options={mdxOptions} />
+        <MDXRemote source={post.content} options={mdxOptions} components={mdxComponents} />
       </div>
       {post.format === 'gallery' && post.layout === 'manga' && (
         <div className="manga">
